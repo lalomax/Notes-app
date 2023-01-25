@@ -4,6 +4,7 @@ import Editor from "./components/Editor";
 import { data } from "./data";
 import Split from "react-split";
 import { nanoid } from "nanoid";
+import Swal from "sweetalert2";
 import "react-mde/lib/styles/css/react-mde-all.css";
 
 export default function App() {
@@ -31,24 +32,36 @@ export default function App() {
   function updateNote(text) {
     // Put the most recently-modified note at the top
     setNotes((oldNotes) => {
-        const newArray = []
-        for (let i=0; i <oldNotes.length; i++) {
-            const oldNote = oldNotes[i]
-            if (oldNote.id=== currentNoteId) {
-                newArray.unshift({...oldNote, body: text})
-            } else {
-                newArray.push(oldNote)
-            }
+      const newArray = [];
+      for (let i = 0; i < oldNotes.length; i++) {
+        const oldNote = oldNotes[i];
+        if (oldNote.id === currentNoteId) {
+          newArray.unshift({ ...oldNote, body: text });
+        } else {
+          newArray.push(oldNote);
         }
-        return newArray
-    }
-    );
+      }
+      return newArray;
+    });
   }
 
   function deleteNote(event, noteId) {
-    event.stopPropagation()
-    setNotes(oldNotes => oldNotes.filter(note => note.id !== noteId))
-    
+    event.stopPropagation();
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setNotes((oldNotes) => oldNotes.filter((note) => note.id !== noteId));
+        Swal.fire("Deleted!", "Your item has been deleted.", "success");
+      }
+    });
+    // setNotes(oldNotes => oldNotes.filter(note => note.id !== noteId))
   }
 
   function findCurrentNote() {
